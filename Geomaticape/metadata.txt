@@ -1,0 +1,8 @@
+[general]
+name=Geomaticape
+description=Herramientas avanzadas de procesamiento raster
+version=1.0
+qgisMinimumVersion=3.22
+author=GeomaticaPE
+email=info@geomatica.pe
+category=Analysis
