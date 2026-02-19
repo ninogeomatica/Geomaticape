@@ -1,0 +1,16 @@
+[general]
+name=Geomaticape Tools
+description=Procesamiento Landsat, Sentinel 2 para análisis SIG profesional
+version=1.1
+qgisMinimumVersion=3.22
+author=Geomática Ambiental
+email=nino@geomatica.pe
+
+about=Suite profesional de procesamiento satelital para Landsat, Sentinel 2 orientado a profesionales SIG.
+
+tracker=https://www.geomatica.pe/
+repository=https://www.geomatica.pe/
+homepage=https://www.geomatica.pe/
+category=Raster
+experimental=False
+deprecated=False
