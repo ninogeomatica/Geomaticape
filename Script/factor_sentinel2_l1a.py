@@ -41,7 +41,7 @@ class FactorSentinel2L1A(QgsProcessingAlgorithm):
 <h3>Factor de escala Sentinel-2 Level-1C</h3>
 <b>Autor:</b> GEOMATICA AMBIENTAL
 <b>Plugin:</b> Geomaticape<br>
-<b>Versión:</b> 1.0
+<b>Versión:</b> 1.2
 <b>Descripción:</b>
 Esta herramienta aplica el factor de escala (0.0001) a las bandas 
 de Sentinel-2 Level-1C para convertir los valores digitales (DN) 

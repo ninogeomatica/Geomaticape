@@ -21,7 +21,7 @@ class FactorLandsat(QgsProcessingAlgorithm):
         return "factor_landsat"
 
     def displayName(self):
-        return "Factor de escala Landsat (SR + Térmica)"
+        return "Factor de escala Landsat C2 L2 (SR + Térmica)"
 
     def group(self):
         return "Geomaticape"
@@ -43,21 +43,38 @@ class FactorLandsat(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return """
-<h3>Factor de escala Landsat Collection 2</h3>
-<b>Autor:</b> GEOMATICA AMBIENTAL
-<b>Plugin:</b> Geomaticape<br>
-<b>Versión:</b> 1.0 <br>
-<b>Descripción:</b>
-Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.0000275) - 0.2 y banda termica: (A * 0.00341802) + 149) - 273.15 del satelite LandSat 8 y 9 Colección Level-2 para convertir los valores digitales (DN) a reflectancia de Superficie y genera una imagen multiespectral SR_B1, SR_B2, SR_B3, SR_B4, SR_B5, SR_B6, SR_B7
+<h3>Factor de escala Landsat Collection 2 L2</h3>
+<b>Autor: </b> GEOMATICA AMBIENTAL
+<b>Plugin: </b> Geomaticape
+<b>Versión: </b> 1.2 
+<b>Aplica factor de escala a:<b>
+<ul>
+<li> ✔ Landsat 4-5 TM C2 L2
+<li> ✔ Landsat 7 ETM+ C2 L2
+<li> ✔ Landsat 8-9 OLI/TIRS C2 L2
+</ul>
+<b>Convierte:<b>
+<ul>
+<li> ✔ Reflectancia superficial
+<li> ✔ Temperatura superficial °C
+</ul>
+<b>Factor multiespectral:<b>
+<ul>
+(A * 0.0000275) - 0.2
+<ul></b>
+<b>Factor térmico:<b>
+<ul>
+((A * 0.00341802) + 149) - 273.15
+<ul>
 <b>Proceso:</b>
 <ul>
 <li> ✔ Aplica el factor de escala bandas multiespectrales y térmicos
 <li> ✔ Convierte a unidad de Temperatura superficial °C  
 <li> ✔ Salida multibanda con sus nombres respectivos.
-<b>Requisito:</b> Landsat 8 y 9
-<b>Web:</b> https://www.geomatica.pe/
-"""
 
+<b>Requisito:</b> Landsat Colección 2 Level 2
+<b>Web: </b> https://www.geomatica.pe/
+"""
     # ---------------------------------------------------
 
     def initAlgorithm(self, config=None):
@@ -65,7 +82,7 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
         self.addParameter(
             QgsProcessingParameterFile(
                 self.INPUT_FOLDER,
-                "Carpeta Landsat Collection 2",
+                "Carpeta Landsat Collection 2 L2",
                 behavior=QgsProcessingParameterFile.Folder
             )
         )
@@ -73,14 +90,14 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
         self.addParameter(
             QgsProcessingParameterRasterDestination(
                 self.OUTPUT_MULTISPECTRAL,
-                "Imagen multiespectral corregida (B1-B7)"
+                "Imagen multiespectral corregida"
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
                 self.OUTPUT_THERMAL,
-                "Banda térmica °C (B10)"
+                "Banda térmica °C"
             )
         )
 
@@ -95,25 +112,77 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
         archivos = os.listdir(folder)
 
         # ---------------------------------------------------
-        # CARPETA TEMPORAL PROFESIONAL (NO ENSUCIA USUARIO)
+        # DETECTAR SATÉLITE POR PREFIJO USGS
+        # ---------------------------------------------------
+        prefijo = None
+
+        for archivo in archivos:
+            nombre = archivo.upper()
+
+            if nombre.startswith("LC08"):
+                prefijo = "LC08"
+                break
+            elif nombre.startswith("LC09"):
+                prefijo = "LC09"
+                break
+            elif nombre.startswith("LE07"):
+                prefijo = "LE07"
+                break
+            elif nombre.startswith("LT05"):
+                prefijo = "LT05"
+                break
+            elif nombre.startswith("LT04"):
+                prefijo = "LT04"
+                break
+
+        if not prefijo:
+            raise Exception("No se reconoce el satélite Landsat")
+
+        # ---------------------------------------------------
+        # CONFIGURACIÓN SEGÚN SATÉLITE
+        # ---------------------------------------------------
+        if prefijo in ["LC08", "LC09"]:
+            feedback.pushInfo(f"🛰 Detectado: Landsat 8/9 ({prefijo})")
+
+            bandas_orden = [
+                "_SR_B1.TIF","_SR_B2.TIF","_SR_B3.TIF",
+                "_SR_B4.TIF","_SR_B5.TIF","_SR_B6.TIF","_SR_B7.TIF"
+            ]
+            nombres = ["aerosol","blue","green","red","nir","swir1","swir2"]
+            thermal_suffix = "_ST_B10.TIF"
+            thermal_name = "B10_Thermal_Celsius"
+
+        elif prefijo == "LE07":
+            feedback.pushInfo("🛰 Detectado: Landsat 7 ETM+")
+
+            bandas_orden = [
+                "_SR_B1.TIF","_SR_B2.TIF","_SR_B3.TIF",
+                "_SR_B4.TIF","_SR_B5.TIF","_SR_B7.TIF"
+            ]
+            nombres = ["blue","green","red","nir","swir1","swir2"]
+            thermal_suffix = "_ST_B6.TIF"
+            thermal_name = "B6_Thermal_Celsius"
+
+        elif prefijo in ["LT05", "LT04"]:
+            feedback.pushInfo(f"🛰 Detectado: Landsat 4/5 TM ({prefijo})")
+
+            bandas_orden = [
+                "_SR_B1.TIF","_SR_B2.TIF","_SR_B3.TIF",
+                "_SR_B4.TIF","_SR_B5.TIF","_SR_B7.TIF"
+            ]
+            nombres = ["blue","green","red","nir","swir1","swir2"]
+            thermal_suffix = "_ST_B6.TIF"
+            thermal_name = "B6_Thermal_Celsius"
+
+        # ---------------------------------------------------
+        # TEMPORAL PRO
         # ---------------------------------------------------
         temp_dir = tempfile.mkdtemp(prefix="landsat_factor_")
-        feedback.pushInfo(f"📂 Temporal interno: {temp_dir}")
+        feedback.pushInfo(f"📂 Carpeta temporal: {temp_dir}")
 
-        # -----------------------
-        # MULTIESPECTRAL B1-B7
-        # -----------------------
-
-        bandas_orden = [
-            "_SR_B1.TIF",
-            "_SR_B2.TIF",
-            "_SR_B3.TIF",
-            "_SR_B4.TIF",
-            "_SR_B5.TIF",
-            "_SR_B6.TIF",
-            "_SR_B7.TIF"
-        ]
-
+        # ---------------------------------------------------
+        # MULTIESPECTRAL
+        # ---------------------------------------------------
         bandas_corregidas = []
 
         for sufijo in bandas_orden:
@@ -147,10 +216,10 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
 
             bandas_corregidas.append(salida_temp)
 
-        # -----------------------
+        # ---------------------------------------------------
         # MERGE MULTIBANDA
-        # -----------------------
-        feedback.pushInfo("🛰 Generando multibanda corregida...")
+        # ---------------------------------------------------
+        feedback.pushInfo("🛰 Generando multibanda...")
 
         processing.run(
             "gdal:merge",
@@ -163,34 +232,31 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
             feedback=feedback
         )
 
-        # Renombrar bandas
         dataset = gdal.Open(output_multi, gdal.GA_Update)
-        band_names = ["aerosol", "blue", "green", "red", "nir", "swir1", "swir2"]
 
-        for i, name in enumerate(band_names):
+        for i, name in enumerate(nombres):
             band = dataset.GetRasterBand(i + 1)
             band.SetDescription(name)
             band.SetNoDataValue(0)
 
         dataset = None
 
-        # -----------------------
-        # BANDA TÉRMICA
-        # -----------------------
-
+        # ---------------------------------------------------
+        # TÉRMICA
+        # ---------------------------------------------------
         thermal_file = None
 
         for archivo in archivos:
-            if archivo.upper().endswith("_ST_B10.TIF"):
+            if archivo.upper().endswith(thermal_suffix):
                 thermal_file = archivo
                 break
 
         if not thermal_file:
-            raise Exception("No se encontró banda ST_B10")
+            raise Exception("No se encontró banda térmica")
 
         ruta_termica = os.path.join(folder, thermal_file)
 
-        feedback.pushInfo("🌡 Calculando temperatura superficial...")
+        feedback.pushInfo("🌡 Calculando temperatura °C...")
 
         processing.run(
             "gdal:rastercalculator",
@@ -208,15 +274,14 @@ Esta herramienta aplica el factor de escala bandas multiespectrales (A * 0.00002
 
         dataset = gdal.Open(output_thermal, gdal.GA_Update)
         band = dataset.GetRasterBand(1)
-        band.SetDescription("B10_Thermal_Celsius")
+        band.SetDescription(thermal_name)
         band.SetNoDataValue(-9999)
         dataset = None
 
         # ---------------------------------------------------
-        # LIMPIEZA AUTOMÁTICA PRO
+        # LIMPIEZA
         # ---------------------------------------------------
-        feedback.pushInfo("🧹 Eliminando temporales internos...")
-
+        feedback.pushInfo("🧹 Eliminando temporales...")
         gc.collect()
 
         try:

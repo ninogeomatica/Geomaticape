@@ -42,7 +42,7 @@ class FactorSentinel2L2A(QgsProcessingAlgorithm):
 
 <b>Autor:</b> GEOMATICA AMBIENTAL <br>
 <b>Plugin:</b> Geomaticape<br><br>
-<b>Versión:</b> 1.0
+<b>Versión:</b> 1.2
 <b>Descripción:</b>
 Esta herramienta aplica el factor de escala (0.0001) a las bandas 
 de Sentinel-2 Level-2A para obtener reflectancia real y genera una 
