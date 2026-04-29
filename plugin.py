@@ -6,6 +6,7 @@ from .Script.factor_landsat import FactorLandsat
 from .Script.factor_sentinel2_l1a import FactorSentinel2L1A
 from .Script.factor_sentinel2_l2a import FactorSentinel2L2A
 from .Script.cbers04a_pansharp import CBERS04APansharp
+from .Script.acp_satelite import ACPSatelite
 
 
 class GeomaticapePlugin:
@@ -14,19 +15,19 @@ class GeomaticapePlugin:
         self.iface = iface
         self.plugin_dir = os.path.dirname(__file__)
         self.actions = []
-        self.menu = None  # Se crea en initGui como QMenu con ícono
+        self.menu = None  # Se crea en initGui como QMenu con icono
 
     def initGui(self):
 
-        # ── Crear el submenú "Geomaticape" con el logo de empresa ──
+        # Crear el submenu "Geomaticape" con el logo de empresa
         logo_path = os.path.join(self.plugin_dir, "Icons", "logo_geomatica.png")
         self.menu = QMenu("Geomaticape", self.iface.mainWindow())
         self.menu.setIcon(QIcon(logo_path))
 
-        # Agregar el submenú al menú "Complementos" de QGIS
+        # Agregar el submenu al menu Complementos de QGIS
         self.iface.pluginMenu().addMenu(self.menu)
 
-        # ── Agregar herramientas al submenú ──
+        # Agregar herramientas al submenu
         self.add_action("Factor escala Landsat",
                         "Icons/landsat.png",
                         FactorLandsat)
@@ -43,9 +44,13 @@ class GeomaticapePlugin:
                         "Icons/cbers04a.png",
                         CBERS04APansharp)
 
+        self.add_action("ACP Multiespectral (cualquier satelite)",
+                        "Icons/acp.png",
+                        ACPSatelite)
+
     def add_action(self, text, icon_path, tool_class):
 
-        icon   = QIcon(os.path.join(self.plugin_dir, icon_path))
+        icon = QIcon(os.path.join(self.plugin_dir, icon_path))
         action = QAction(icon, text, self.iface.mainWindow())
         action.triggered.connect(lambda: tool_class().run())
 
@@ -54,7 +59,7 @@ class GeomaticapePlugin:
         self.actions.append(action)
 
     def unload(self):
-        # Eliminar el submenú completo al desactivar el plugin
+        # Eliminar el submenu completo al desactivar el plugin
         if self.menu:
             self.iface.pluginMenu().removeAction(self.menu.menuAction())
             self.menu = None

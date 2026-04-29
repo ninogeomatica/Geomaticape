@@ -1,23 +1,25 @@
 [general]
 name=Geomaticape Tools
-description=Landsat, Sentinel-2 and CBERS-04A preprocessing for professional GIS analysis
-version=1.3
+description=Landsat, Sentinel-2, CBERS-04A preprocessing and PCA analysis for professional GIS workflows
+version=1.4
 qgisMinimumVersion=3.22
 author=Geomatica Ambiental
 email=nino@geomatica.pe
 authorUrl=https://www.geomatica.pe/
 
-about=GeomaticaPE is a QGIS plugin developed by Geomatica Ambiental to automate the preprocessing of multispectral satellite imagery. It is designed for GIS professionals, researchers, and technicians who require efficient, reproducible workflows with analysis-ready outputs.
+about=GeomaticaPE is a QGIS plugin developed by Geomatica Ambiental to automate the preprocessing and analysis of multispectral satellite imagery. It is designed for GIS professionals, researchers, and technicians who require efficient, reproducible workflows with analysis-ready outputs.
 
     Supported sensors:
     - Landsat 4/5 TM, 7 ETM+, 8/9 OLI-TIRS — Collection 2 Level 2
     - Sentinel-2 MSI — Level-1C and Level-2A
     - CBERS-04A WPM — Pansharpening at 2-meter resolution
+    - Any multispectral sensor — for PCA analysis (Landsat, Sentinel, CBERS, PlanetScope, RapidEye, ASTER, MODIS...)
 
     Key features:
     - Radiometric correction: applies official scale factors to obtain true surface reflectance
     - Land Surface Temperature: converts Landsat thermal band to degrees Celsius (°C)
     - Brovey Pansharpening: panchromatic fusion of CBERS-04A imagery at 2m with AOI clipping
+    - Principal Component Analysis (PCA / ACP): generates PCA1, PCA2, PCA3 raster + variance bar chart for any multispectral image (auto-detects bands and resolution)
     - Multiband output: generates GeoTIFF with internal band names automatically assigned
     - Automatic resampling: harmonizes spatial resolutions (10m, 20m, 60m) into a single image
 
@@ -32,17 +34,12 @@ tracker=https://www.geomatica.pe/
 repository=https://www.geomatica.pe/
 homepage=https://www.geomatica.pe/
 category=Raster
-tags=landsat, sentinel, cbers, reflectance, pansharpening, remote sensing, scale factor, land surface temperature, raster, radiometric correction
+tags=landsat, sentinel, cbers, reflectance, pansharpening, pca, principal components, remote sensing, scale factor, land surface temperature, raster, radiometric correction
 hasProcessingProvider=yes
 server=False
 experimental=False
 deprecated=False
 
-changelog=1.3
-    - New: CBERS-04A Brovey Pansharpening at 2m with vector AOI clipping
-    1.2
-    - Scale factor for Sentinel-2 L2A (10m) with automatic resampling of 20m and 60m bands
-    - Scale factor for Sentinel-2 L1A
-    - Scale factor for Landsat Collection 2 L2 (Surface Reflectance + Land Surface Temperature °C)
-    - Support for Landsat 4/5 TM, 7 ETM+, 8/9 OLI/TIRS
-    - Internal band names automatically assigned to output rasters
+changelog=1.4
+    - New: PCA / ACP Multispectral tool — works with any satellite sensor
+      • Auto-de
