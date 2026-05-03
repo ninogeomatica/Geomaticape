@@ -21,10 +21,10 @@ class FactorSentinel2L1A(QgsProcessingAlgorithm):
         return "Factor de escala Sentinel-2 L1C (10m)"
 
     def group(self):
-        return "Geomaticape"
+        return "Conversion"
 
     def groupId(self):
-        return "geomaticape"
+        return "geomaticape_conversion"
     def icon(self):
         from qgis.PyQt.QtGui import QIcon
         return QIcon(os.path.join(os.path.dirname(__file__), 'icon.png'))

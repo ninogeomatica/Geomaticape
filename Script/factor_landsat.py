@@ -21,10 +21,10 @@ class FactorLandsat(QgsProcessingAlgorithm):
         return "factor_landsat"
 
     def displayName(self):
-        return "Factor de escala Landsat C2 L2 (SR + Térmica)"
+        return "Factor escala Landsat C2 L2 (SR + LST)"
 
     def group(self):
-        return "Geomaticape"
+        return "Conversion"
 
     def icon(self):
         from qgis.PyQt.QtGui import QIcon
@@ -32,7 +32,7 @@ class FactorLandsat(QgsProcessingAlgorithm):
 
 
     def groupId(self):
-        return "geomaticape"
+        return "geomaticape_conversion"
 
     def createInstance(self):
         return FactorLandsat()

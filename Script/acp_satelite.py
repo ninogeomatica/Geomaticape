@@ -45,10 +45,10 @@ class ACPSatelite(QgsProcessingAlgorithm):
         return "ACP Multiespectral (cualquier satélite)"
 
     def group(self):
-        return "Geomaticape"
+        return "Procesamiento"
 
     def groupId(self):
-        return "geomaticape"
+        return "geomaticape_procesamiento"
 
     def icon(self):
         from qgis.PyQt.QtGui import QIcon
